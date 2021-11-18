@@ -16,4 +16,5 @@ class Question(models.Model):
     title_slug = models.CharField(max_length=250)
     score = models.IntegerField()
     contest = models.ForeignKey(
-        to=ContestInfo, related_name='questions', on_delete=models.CASCADE)
+        to=ContestInfo, related_name="questions", on_delete=models.CASCADE
+    )
