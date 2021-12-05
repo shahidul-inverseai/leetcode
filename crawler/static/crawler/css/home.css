@@ -1,0 +1,31 @@
+#contest_table {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#contest_table td,
+#contest_table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#contest_table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+#contest_table tr:hover {
+  background-color: #ddd;
+}
+
+#contest_table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04aa6d;
+  color: white;
+}
+
+#update-form {
+  display: none;
+}

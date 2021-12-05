@@ -1,0 +1,48 @@
+{% load static %}
+
+<html lang="en">
+  <head>
+    <title>crawl contest</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'crawler/js/home.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'crawler/css/home.css' %}" />
+  </head>
+  <body>
+    <div>
+      <div id="update-form">
+        <form action="{% url 'home' %}" method="POST">
+          {% csrf_token %}
+          <label for="contest-id">Weekly Contest ID</label>
+          <input type="number" name="contest-id" id="contest-id" />
+          <div id="form-btn">
+            <button id="update-btn">Update</button>
+          </div>
+        </form>
+        <button id="cancel-btn">Cancel</button>
+      </div>
+      <div id="add-contest-btn">
+        <button>Add New Contest</button>
+      </div>
+    </div>
+
+    <table id="contest_table">
+      <tr>
+        <!-- <th>Contest ID</th> -->
+        <th>Contest Name</th>
+        <th>Start Time</th>
+        <th>Status</th>
+        <th>Ranklist</th>
+      </tr>
+      {% for item in contests %}
+      <tr>
+        <!-- <td>{{item.id}}</td> -->
+        <td>{{item.title}}</td>
+        <td>{{item.start_time}}</td>
+        <td>Running...</td>
+        <td><a href="{% url 'ranklist' id=item.id %}">View</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>
