@@ -13,7 +13,26 @@ import time
 
 def home(request):
     if request.method == "GET":
-        contests = ContestInfo.objects.all()
+        contests = ContestInfo.objects.order_by("start_time").all().reverse()
+        contestants = Contestant.objects.all()
+        context = {}
+        for contestant in contestants:
+            contestant_name = contestant.name
+            print(contestant_name)
+            contestant_solved_problems = Question.objects.filter(solved_by=contestant)
+            for contest in contests:
+                print(contest.title)
+                solved_problems = contestant_solved_problems.filter(
+                    contest__id=contest.id
+                )
+
+                for problem in solved_problems:
+                    print(problem.title)
+
+            # print(contestant_name, contestant_solved_problems)
+
+            # for contest in contests:
+
         context = {"contests": contests}
         return render(request, "crawler/home.html", context)
     else:
@@ -32,9 +51,7 @@ def home(request):
                 contest_id = response["contest"]["id"]
                 contest_title = response["contest"]["title"]
                 contest_title_slug = response["contest"]["title_slug"]
-                contest_start_time = time.asctime(
-                    time.localtime(response["contest"]["start_time"])
-                )
+                contest_start_time = response["contest"]["start_time"]
                 # print("time ", response["contest"]["start_time"], contest_start_time)
                 newContest = ContestInfo(
                     id=contest_id,
