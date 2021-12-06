@@ -29,3 +29,9 @@
 #update-form {
   display: none;
 }
+
+#contest_table td div{
+  display: flex;
+  /* flex-direction: column; */
+  
+}

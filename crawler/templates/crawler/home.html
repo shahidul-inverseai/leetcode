@@ -3,12 +3,14 @@
 <html lang="en">
   <head>
     <title>crawl contest</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/js/all.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="{% static 'crawler/js/home.js' %}"></script>
 
     <link rel="stylesheet" href="{% static 'crawler/css/home.css' %}" />
   </head>
   <body>
+    {{context|json_script:"myContext"}}
     <div>
       <div id="update-form">
         <form action="{% url 'home' %}" method="POST">
@@ -28,21 +30,28 @@
 
     <table id="contest_table">
       <tr>
-        <!-- <th>Contest ID</th> -->
-        <th>Contest Name</th>
-        <th>Start Time</th>
-        <th>Status</th>
-        <th>Ranklist</th>
+        <th>Contestants</th>
+        {% for contest in context.contests %}
+        <th>
+          <div class="table-header {{contest.titleSlug}}">
+            <div class="header">
+              <div id="contest-title"></div>
+              <div id="refresh"></div>
+            </div>
+            <div class="footer">
+              <div id="contest-status"></div>
+              <div id="contest-time"></div>
+            </div>
+          </div>
+        </th>
+        {% endfor %}
       </tr>
-      {% for item in contests %}
-      <tr>
-        <!-- <td>{{item.id}}</td> -->
-        <td>{{item.title}}</td>
-        <td>{{item.start_time}}</td>
-        <td>Running...</td>
-        <td><a href="{% url 'ranklist' id=item.id %}">View</a></td>
-      </tr>
-      {% endfor %}
     </table>
+    <!-- 
+    <script type="text/javascript">
+      $(function () {
+        
+        
+    </script> -->
   </body>
 </html>

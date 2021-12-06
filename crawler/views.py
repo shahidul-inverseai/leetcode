@@ -12,29 +12,51 @@ import time
 
 
 def home(request):
+    currentTime = time.time()
     if request.method == "GET":
         contests = ContestInfo.objects.order_by("start_time").all().reverse()
         contestants = Contestant.objects.all()
-        context = {}
+        context = {
+            "users" : [],
+            "contests" : [],
+        }
         for contestant in contestants:
-            contestant_name = contestant.name
-            print(contestant_name)
             contestant_solved_problems = Question.objects.filter(solved_by=contestant)
+            
+            myContests = []
             for contest in contests:
-                print(contest.title)
                 solved_problems = contestant_solved_problems.filter(
                     contest__id=contest.id
                 )
-
+                
+                hasSolved = ["no", "no", "no", "no"]
                 for problem in solved_problems:
-                    print(problem.title)
+                    hasSolved[problem.score-3] = "yes"
 
-            # print(contestant_name, contestant_solved_problems)
+                myContests.append({
+                    "contestName" : contest.title,
+                    "hasSolved" : hasSolved
+                })
 
-            # for contest in contests:
-
-        context = {"contests": contests}
-        return render(request, "crawler/home.html", context)
+            context["users"].append({
+                "name" : contestant.name,
+                "contests" : myContests
+            })
+        
+        for contest in contests:
+            context["contests"].append({
+                "title" : contest.title,
+                "titleSlug": contest.title_slug,
+                "startTime" : contest.start_time,
+                "endTime" : float(contest.start_time) + 5400,
+                "virtualEndTime" : float(contest.start_time) + 604800,
+                "hasEnded" : True if currentTime - float(contest.start_time) >=5400 else False,
+                "hasVirtualEnded" : True if currentTime - float(contest.start_time) >=604800 else False
+            })
+        # context["contests"] = list(context["contests"])
+        # print(json.dumps(context))
+        # print(type(json.dumps(context)))
+        return render(request, "crawler/home.html",{"context" : context})
     else:
         if request.POST.get("contest-id"):
             response = requests.get(
