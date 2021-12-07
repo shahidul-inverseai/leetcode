@@ -30,15 +30,14 @@ $(document).ready(function () {
     if (contest["hasVirtualEnded"]) {
       tableHeader.classList.remove("running");
       tableHeader.className += " ended";
-      refresh.innerHTML = "button";
-      contestStatus.innerHTML = "ended on";
-      contestTime.innerHTML = "end time";
+      contestStatus.innerHTML = "ended on: " + contest.endTime;
     } else {
       tableHeader.classList.remove("ended");
       tableHeader.className += " running";
-      refresh.innerHTML = "no button";
-      contestStatus.innerHTML = "running";
-      contestTime.innerHTML = "remaining time";
+      const refresh_i_button = document.createElement("i");
+      refresh_i_button.className = "fas fa-sync";
+      refresh.appendChild(refresh_i_button);
+      contestStatus.innerHTML = "remaining time: "+ contest.remainingTime;
     }
   }
 
@@ -47,9 +46,12 @@ $(document).ready(function () {
   for (const contestant of myContext.users) {
     const row = document.createElement("tr");
     const cell = document.createElement("td");
+    const div = document.createElement("div");
     const cellText = document.createTextNode(contestant.name);
 
-    row.appendChild(cell.appendChild(cellText));
+    div.appendChild(cellText);
+    cell.appendChild(div);
+    row.appendChild(cell);
 
     for (const contest of contestant.contests) {
       const divCell = document.createElement("td");
@@ -68,32 +70,15 @@ $(document).ready(function () {
           i_button.className = "fas fa-times-circle";
         }
 
-        // button.appendChild(i_buttn);
-        innerDiv.appendChild(i_button)
-        wrapperDiv.appendChild(innerDiv)
+        innerDiv.appendChild(i_button);
+        wrapperDiv.appendChild(innerDiv);
       }
-      divCell.appendChild(wrapperDiv)
-      row.appendChild(divCell)
+      divCell.appendChild(wrapperDiv);
+      row.appendChild(divCell);
     }
 
     tableBody.appendChild(row);
   }
-  console.log(table);
   table.appendChild(tableBody);
 });
 
-// const myContext = {{jsonContext|safe}};
-
-//         for (let contest of myContext.contests) {
-
-//         }
-//       });
-
-// let del_btn = document.createElement("button");
-// let rot_btn = document.createElement("button");
-// let i_del_btn = document.createElement("i");
-// let i_rot_btn = document.createElement("i");
-// i_del_btn.className = "fas fa-minus-circle";
-// i_rot_btn.className = "fas fa-undo";
-// del_btn.appendChild(i_del_btn);
-// rot_btn.appendChild(i_rot_btn);

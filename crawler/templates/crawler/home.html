@@ -30,7 +30,7 @@
 
     <table id="contest_table">
       <tr>
-        <th>Contestants</th>
+        <th><div class="tahble-header">Contestants</div></th>
         {% for contest in context.contests %}
         <th>
           <div class="table-header {{contest.titleSlug}}">
@@ -40,7 +40,6 @@
             </div>
             <div class="footer">
               <div id="contest-status"></div>
-              <div id="contest-time"></div>
             </div>
           </div>
         </th>

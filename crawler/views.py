@@ -48,14 +48,12 @@ def home(request):
                 "title" : contest.title,
                 "titleSlug": contest.title_slug,
                 "startTime" : contest.start_time,
-                "endTime" : float(contest.start_time) + 5400,
+                "endTime" : time.asctime(time.localtime(float(contest.start_time) + 5400)),
                 "virtualEndTime" : float(contest.start_time) + 604800,
+                "remainingTime" : float(contest.start_time) + 604800 - currentTime,
                 "hasEnded" : True if currentTime - float(contest.start_time) >=5400 else False,
                 "hasVirtualEnded" : True if currentTime - float(contest.start_time) >=604800 else False
             })
-        # context["contests"] = list(context["contests"])
-        # print(json.dumps(context))
-        # print(type(json.dumps(context)))
         return render(request, "crawler/home.html",{"context" : context})
     else:
         if request.POST.get("contest-id"):
