@@ -23,6 +23,12 @@ class Question(models.Model):
 class Contestant(models.Model):
     handle = models.CharField(max_length=250, primary_key=True)
     name = models.CharField(max_length=250)
-    solved_problems = models.ManyToManyField(
-        to=Question, related_name="solved_by", blank=True
-    )
+    # solved_problems = models.ManyToManyField(
+    #     to=Question, related_name="solved_by", blank=True
+    # )
+
+class Contestant_Question(models.Model):
+    contestant = models.ForeignKey(to=Contestant, related_name="attemped", on_delete=models.CASCADE, blank=False)
+    question = models.ForeignKey(to=Question, related_name='solved_by', on_delete=models.CASCADE, blank=False)
+    status = models.CharField(max_length=50)
+    timestamp = models.FloatField()

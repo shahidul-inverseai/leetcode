@@ -9,14 +9,19 @@ import json
 import time
 
 def home(request):
+    currentTime = time.time()
+    context = {
+        "contests": []
+    }
     if request.method == "POST":
-        print(request.POST.get)
         response = requests.get(
                 "https://leetcode.com/contest/api/info/weekly-contest-"
                 + request.POST.get("contest-id")
                 + "/"
             ).json()
-        if response["contest"]["start_time"] < time.time():
+        if('erro' in response.keys()):
+            context['error'] = "Enter valid contest ID"
+        elif response["contest"]["start_time"] < currentTime:
             contest_id = response["contest"]["id"]
             contest_title = response["contest"]["title"]
             contest_title_slug = response["contest"]["title_slug"]
@@ -44,28 +49,46 @@ def home(request):
                 )
                 newQuestion.save()
 
-
     contests = ContestInfo.objects.order_by("start_time").all().reverse()
-    context = {
-        "contests": []
-    }
+    
     for contest in contests:
+        status = "Finished!"
+        if currentTime - float(contest.start_time) < 604800:
+            status = "Runnig.."
         context["contests"].append({
             "id": contest.id,
             "title": contest.title,
-            "start_time": contest.start_time
+            # "start_time": contest.start_time,
+            "status" : status
         })
     return render(request, "crawler/home.html", context = context)
 
 
 def ranklist(request, id):
+    context = []
+    questions = ContestInfo.objects.get(id=id).questions.all()
+    contestants = Contestant.objects.all()
+
+    for contestant in contestants:
+        solved_problems = questions.filter(solved_by=contestant)
+        hasSolved = ["no", "no", "no", "no"]
+        scores = 0
+        for problem in solved_problems:
+            hasSolved[problem.score-3]="yes"
+            scores += problem.score
+        context.append({
+            "name": contestant.name,
+            "handle": contestant.handle,
+            "solved": hasSolved,
+            "scores": scores
+        })
     #  contest = Contest.objects.get(id=id)
     #  currentTime = time.time()
 
     #  print(time.asctime(time.localtime(contest.start-time)))
     #  print(time.asctime(time.localtime(currentTime)))
-
-     return render(request, "crawler/ranklist.html")
+    print(context)
+    return render(request, "crawler/ranklist.html", {"context" : context})
 
 
      
