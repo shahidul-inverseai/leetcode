@@ -6,26 +6,46 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="{% static 'crawler/js/home.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'crawler/css/home.css' %}" />
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'crawler/js/ranklist.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'crawler/css/ranklist.css' %}" />
+
     <title>Rank List</title>
   </head>
   <body>
-    {{context|json_script:"myContext"}}
+    <div>
+      <div>
+        <form action="{% url 'ranklist' id %}" method="POST">
+          {% csrf_token %}
+          <button>Refresh</button>
+        </form>
+      </div>
+      <div>
+        <form action="{% url 'home' %}" method="GET">
+          <button>Back to all contests</button>
+        </form>
+      </div>
+    </div>
 
-    <table id="ranklist_table">
+    <table id="contest_table">
       <tr>
-        <th><div class="table-header-1">Contestants</div></th>
+        <th><div class="table-header-1">Contestant</div></th>
         <th><div class="table-header-2">Problem A</div></th>
-        <th><div class="table-header-2">Problem B</div></th>
-        <th><div class="table-header-2">Problem C</div></th>
-        <th><div class="table-header-2">Problem A</div></th>
+        <th><div class="table-header-3">Problem B</div></th>
+        <th><div class="table-header-4">Problem C</div></th>
+        <th><div class="table-header-5">Problem D</div></th>
       </tr>
-      {% for infos in context %}
+      {% for infos in data %}
       <tr>
-        <td>
-          <p>{{infos.name}}</p>
-        </td>
+        <td>{{infos.name}}</td>
+        {% for i in infos.status %} {% if i == "Accepted"%}
+        <td class="Accepted">{{i}}</td>
+        {% elif i == -1 %}
+        <td class="N/A"></td>
+        {% else %}
+        <td class="Wrong">{{i}}</td>
+        {% endif %} {% endfor %}
       </tr>
       {% endfor %}
     </table>

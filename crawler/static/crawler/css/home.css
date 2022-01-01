@@ -1,7 +1,24 @@
+
+body{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+pre {
+  margin: 0;
+}
+
+a{
+  text-decoration-line: none;
+}
+
 #contest_table {
+  align-self: center;
   font-family: Arial, Helvetica, sans-serif;
   border-collapse: collapse;
-  width: 100%;
+  width: 90%;
+  max-width: 900px;
 }
 #contest_table td,
 #contest_table th {
@@ -19,7 +36,20 @@
   color: white;
 }
 
-.table-header {
+td > *{
+  margin-left: 30px;
+}
+
+
+#add-contest-btn{
+  width:fit-content;
+}
+
+#add-contest-btn button:hover{
+  cursor: pointer;
+}
+
+/* .table-header {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -30,21 +60,21 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-}
+} */
 
-.ended #refresh {
+/* .ended #refresh {
   display: none;
-}
+} */
 
-.footer {
+/* .footer {
   display: flex;
   flex-direction: row;
 }
 
-#contest_table td div{
+#contest_table td div {
   display: flex;
   justify-content: space-around;
-}
+} */
 
 #update-form {
   display: none;

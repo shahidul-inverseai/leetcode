@@ -32,7 +32,7 @@
         <button>Add New Contest</button>
       </div>
     </div>
-
+  </br>
     <table id="contest_table">
       <tr>
         <th><div class="table-header-1">Contest List</div></th>
@@ -43,7 +43,7 @@
         <td>
           <a href="ranklist/{{contest.id}}"> {{contest.title}} </a>
         </td>
-        <td>{{contest.status}}</td>
+        <td><pre>{{contest.status}}</pre></td>
       </tr>
       {% endfor %}
     </table>

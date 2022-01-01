@@ -4,9 +4,19 @@ from django.shortcuts import redirect, render
 import requests
 from django.http import HttpResponse
 
-from crawler.models import Contestant, Question, ContestInfo
+from crawler.models import Contestant, Contestant_Question, Question, ContestInfo
 import json
 import time
+
+def convert_time(sec):
+    sec = sec % (24 * 3600)
+    hour = sec // 3600
+    sec %= 3600
+    min = sec // 60
+    sec %= 60
+    print("seconds value in hours:",hour)
+    print("seconds value in minutes:",min)
+    return "%02d:%02d:%02d" % (hour, min, sec) 
 
 def home(request):
     currentTime = time.time()
@@ -19,7 +29,8 @@ def home(request):
                 + request.POST.get("contest-id")
                 + "/"
             ).json()
-        if('erro' in response.keys()):
+        print(response)
+        if('error' in response.keys()):
             context['error'] = "Enter valid contest ID"
         elif response["contest"]["start_time"] < currentTime:
             contest_id = response["contest"]["id"]
@@ -52,9 +63,14 @@ def home(request):
     contests = ContestInfo.objects.order_by("start_time").all().reverse()
     
     for contest in contests:
-        status = "Finished!"
+        # status = "Finished!"
+
         if currentTime - float(contest.start_time) < 604800:
-            status = "Runnig.."
+            rem = convert_time(float(contest.start_time) + 604800 - currentTime)
+            status = "Running\nremaining time " + rem
+            # print(status)
+        else:
+            status = "Finished"# + time.asctime(time.localtime(float(contest.start_time) + 604800))
         context["contests"].append({
             "id": contest.id,
             "title": contest.title,
@@ -65,30 +81,95 @@ def home(request):
 
 
 def ranklist(request, id):
-    context = []
+    context = {
+        "id": id,
+        "data": []
+    }
     questions = ContestInfo.objects.get(id=id).questions.all()
     contestants = Contestant.objects.all()
+    print(request.method)
+    if request.method == "POST":
+        for contestant in contestants:
+            payload = {
+                "operationName": "getRecentSubmissionList",
+                "variables": {"username": contestant.handle},
+                "query": "query getRecentSubmissionList($username: String!, $limit: Int) {\n  recentSubmissionList(username: $username, limit: $limit) {\n    title\n    titleSlug\n    timestamp\n    statusDisplay\n    lang\n    __typename\n  }\n  languageList {\n    id\n    name\n    verboseName\n    __typename\n  }\n}\n",
+            }
+            response = requests.post(
+                url="https://leetcode.com/graphql",
+                json=payload,
+            )
+            response = response.json()
+            for submission in reversed(response["data"]["recentSubmissionList"]):
+                print("submission", submission)
+                for ques in questions:
+                    print("    ques", ques)
+                    if ques.title_slug == submission["titleSlug"]:
+                        print("found")
+                        query = Contestant_Question.objects.filter(question=ques).filter(contestant = contestant)
+                        print("        query", query)
+                        if submission['statusDisplay'] == "Accepted":
+                            if query:
+                                print("acepted and query found")
+                                query[0].status = "Accepted"
+                                query[0].timestamp = submission["timestamp"]
+                                query[0].save()
+                            else:
+                                print("accepted but query not found")
+                                new = Contestant_Question(contestant = contestant, question = ques, status = "Accepted", timestamp = submission["timestamp"])
+                                new.save()
+                        elif query:
+                            if query[0].status == "Accepted":
+                                continue
+                            print("not accepted and query found")
+                            query[0].status = submission["statusDisplay"]
+                            query[0].timestamp = submission["timestamp"]
+                            # query.set(status = submission["statusDisplay"], timestamp = submission["timestamp"])
+                            query[0].save()
+                        else:
+                            print("not accepted and query not found")
+                            new = Contestant_Question(contestant = contestant, question = ques, status = submission["statusDisplay"], timestamp = submission['timestamp'])
+                            new.save()
+                        # break
+                    else:
+                        print("not found")
+                # if submission["statusDisplay"] == "Accepted":
+                #     for ques in questions:
+                #         if ques.title_slug == submission.titleSlug:
+                #             new_solve = Contestant_Question(
+                #                 contestant, 
+                #                 ques, 
+                #                 submission['statusDisplay'], 
+                #                 submission['timestamp']
+                #             )
+                #             new_solve.save()
+                #             break
 
+    
     for contestant in contestants:
-        solved_problems = questions.filter(solved_by=contestant)
-        hasSolved = ["no", "no", "no", "no"]
+        solved_list = contestant.attempted.all()
+        timestamp = []
+        status = []
         scores = 0
-        for problem in solved_problems:
-            hasSolved[problem.score-3]="yes"
-            scores += problem.score
-        context.append({
+        for ques in questions:
+            found = solved_list.filter(question=ques)
+            if found:
+                timestamp.append(found[0].timestamp)
+                status.append(found[0].status)
+                if(found[0].status=="Accepted"):
+                    scores += ques.score
+            else:
+                timestamp.append(-1)
+                status.append(-1)
+        context['data'].append({
             "name": contestant.name,
             "handle": contestant.handle,
-            "solved": hasSolved,
-            "scores": scores
+            "scores": scores,
+            "timestamp": timestamp,
+            "status": status
         })
-    #  contest = Contest.objects.get(id=id)
-    #  currentTime = time.time()
-
-    #  print(time.asctime(time.localtime(contest.start-time)))
-    #  print(time.asctime(time.localtime(currentTime)))
     print(context)
-    return render(request, "crawler/ranklist.html", {"context" : context})
+    return render(request, "crawler/ranklist.html", context)
 
 
      
