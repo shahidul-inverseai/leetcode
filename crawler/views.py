@@ -14,8 +14,8 @@ def convert_time(sec):
     sec %= 3600
     min = sec // 60
     sec %= 60
-    print("seconds value in hours:",hour)
-    print("seconds value in minutes:",min)
+    # print("seconds value in hours:",hour)
+    # print("seconds value in minutes:",min)
     return "%02d:%02d:%02d" % (hour, min, sec) 
 
 def home(request):
@@ -29,7 +29,7 @@ def home(request):
                 + request.POST.get("contest-id")
                 + "/"
             ).json()
-        print(response)
+        # print(response)
         if('error' in response.keys()):
             context['error'] = "Enter valid contest ID"
         elif response["contest"]["start_time"] < currentTime:
@@ -87,7 +87,7 @@ def ranklist(request, id):
     }
     questions = ContestInfo.objects.get(id=id).questions.all()
     contestants = Contestant.objects.all()
-    print(request.method)
+    # print(request.method)
     if request.method == "POST":
         for contestant in contestants:
             payload = {
@@ -101,38 +101,39 @@ def ranklist(request, id):
             )
             response = response.json()
             for submission in reversed(response["data"]["recentSubmissionList"]):
-                print("submission", submission)
+                # print("submission", submission)
                 for ques in questions:
-                    print("    ques", ques)
+                    # print("    ques", ques)
                     if ques.title_slug == submission["titleSlug"]:
-                        print("found")
+                        # print("found")
                         query = Contestant_Question.objects.filter(question=ques).filter(contestant = contestant)
-                        print("        query", query)
+                        # print("        query", query)
                         if submission['statusDisplay'] == "Accepted":
                             if query:
-                                print("acepted and query found")
+                                # print("acepted and query found")
                                 query[0].status = "Accepted"
                                 query[0].timestamp = submission["timestamp"]
                                 query[0].save()
                             else:
-                                print("accepted but query not found")
+                                # print("accepted but query not found")
                                 new = Contestant_Question(contestant = contestant, question = ques, status = "Accepted", timestamp = submission["timestamp"])
                                 new.save()
                         elif query:
                             if query[0].status == "Accepted":
                                 continue
-                            print("not accepted and query found")
+                            # print("not accepted and query found")
                             query[0].status = submission["statusDisplay"]
                             query[0].timestamp = submission["timestamp"]
                             # query.set(status = submission["statusDisplay"], timestamp = submission["timestamp"])
                             query[0].save()
                         else:
-                            print("not accepted and query not found")
+                            # print("not accepted and query not found")
                             new = Contestant_Question(contestant = contestant, question = ques, status = submission["statusDisplay"], timestamp = submission['timestamp'])
                             new.save()
                         # break
                     else:
-                        print("not found")
+                        pass 
+                        # print("not found")
                 # if submission["statusDisplay"] == "Accepted":
                 #     for ques in questions:
                 #         if ques.title_slug == submission.titleSlug:
@@ -168,7 +169,7 @@ def ranklist(request, id):
             "timestamp": timestamp,
             "status": status
         })
-    print(context)
+    # print(context)
     return render(request, "crawler/ranklist.html", context)
 
 

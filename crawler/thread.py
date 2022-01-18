@@ -2,7 +2,8 @@ import threading
 
 
 def func():
-  print('called')
+  pass 
+  # print('called')
 
 thread = threading.Timer(2, func)
 
