@@ -2,7 +2,7 @@ from .default import *
 
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 DEBUG = False
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['leetcode.test.inverseai.com', 'localhost', '127.0.0.1']
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
