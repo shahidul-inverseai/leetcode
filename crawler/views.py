@@ -161,13 +161,15 @@ def ranklist(request, id):
             else:
                 timestamp.append(-1)
                 status.append(-1)
-        context['data'].append({
-            "name": contestant.name,
-            "handle": contestant.handle,
-            "scores": scores,
-            "timestamp": timestamp,
-            "status": status
-        })
+
+        if sum(timestamp)!=-4:
+            context['data'].append({
+                "name": contestant.name,
+                "handle": contestant.handle,
+                "scores": scores,
+                "timestamp": timestamp,
+                "status": status
+            })
     print(context)
     return render(request, "crawler/ranklist.html", context)
 
